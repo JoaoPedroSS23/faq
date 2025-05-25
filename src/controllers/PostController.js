@@ -1,6 +1,7 @@
 // => Controller de posts (ou publicações)
 const store = (req, res) => {
-    res.send({type: 'POST'})
+    body = req.body;
+    
 }
 
 const update = (req, res) => {
