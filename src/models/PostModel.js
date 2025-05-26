@@ -11,7 +11,7 @@ const Comments = new Schema({
 });
 
 const PostSchema = new Schema({
-    postName: {
+    postTitle: {
         type: String,
         required: [true, '*Campo Obrigatório!']
     },
@@ -27,6 +27,9 @@ const PostSchema = new Schema({
     comments: {
         type: Comments,
 
+    },
+    postDate: {
+        type: Date
     }
 });
 
