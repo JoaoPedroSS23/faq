@@ -1,0 +1,23 @@
+.toast {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.toastError {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #e52f2f;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  text-align: center;
+}

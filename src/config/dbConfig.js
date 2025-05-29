@@ -13,3 +13,7 @@ mongoose.connection.on('connected', () => {
 mongoose.connection.on('error', (err) => {
   console.log('Database error '+err);
 });
+
+mongoose.Promise = global.Promise
+
+module.exports = mongoose;

@@ -12,7 +12,7 @@ const store = async (req, res) => {
             }
             await PostModel.create(post)
 
-            res.send({message: 'Dúvida inserida com sucesso!'}).withStatus(201);
+            res.status(201).send({message: 'Dúvida inserida com sucesso!'});
         } else {
             throw new Error('Não foi possível concluir sua solicitação. Entre em contato com o administrador do sistema.');
         }

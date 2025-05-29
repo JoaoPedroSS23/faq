@@ -1,0 +1,45 @@
+<script>
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.classList.add('toast');
+        toast.innerText = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000); // Remover após 3 segundos
+    }
+
+    function showToastError(message) {
+        const toast = document.createElement('div');
+        toast.classList.add('toastError');
+        toast.innerText = message;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000); // Remover após 3 segundos
+    }
+
+    const setRequired = (element) => {
+        element.style.border = '1px solid red';
+    }
+    
+    const resetRequired = (element) => {
+        element.style.border = null;
+    }
+    
+    const disabledButton = (element, status) => {
+        
+        if(status) {
+            element.style.opacity = .33;
+        } else {
+            element.style.opacity = 1;
+        }
+
+
+        element.disabled = status;
+    
+    }
+</script>
