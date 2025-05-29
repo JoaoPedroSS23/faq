@@ -42,4 +42,59 @@
         element.disabled = status;
     
     }
+
+
+    const createPost = (row) => {
+        const newDetails = document.createElement('details');
+        newDetails.className = 'flex flex-col rounded-xl border border-[#e0e0e0] bg-white px-[15px] py-[7px] group';
+
+        // Cria o summary
+        const summary = document.createElement('summary');
+        summary.className = 'flex cursor-pointer items-center justify-between gap-6 py-2';
+
+        // Cria o parágrafo do título
+        const title = document.createElement('p');
+        title.className = 'text-[#141414] text-sm font-medium leading-normal';
+        title.textContent = row.postTitle;
+
+        // Cria o ícone wrapper
+        const iconWrapper = document.createElement('div');
+        iconWrapper.className = 'text-[#141414] group-open:rotate-180';
+        iconWrapper.setAttribute('data-icon', 'CaretDown');
+        iconWrapper.setAttribute('data-size', '20px');
+        iconWrapper.setAttribute('data-weight', 'regular');
+
+        // Cria o SVG
+        const svgNS = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('xmlns', svgNS);
+        svg.setAttribute('width', '20px');
+        svg.setAttribute('height', '20px');
+        svg.setAttribute('fill', 'currentColor');
+        svg.setAttribute('viewBox', '0 0 256 256');
+
+        // Cria o path
+        const path = document.createElementNS(svgNS, 'path');
+        path.setAttribute('d', 'M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z');
+
+        // Monta o SVG
+        svg.appendChild(path);
+        iconWrapper.appendChild(svg);
+
+        // Monta o summary
+        summary.appendChild(title);
+        summary.appendChild(iconWrapper);
+
+        // Cria o parágrafo de conteúdo
+        const content = document.createElement('p');
+        content.className = 'text-[#757575] text-sm font-normal leading-normal pb-2';
+        content.textContent = row.postDescription; // ou coloque algum conteúdo aqui
+
+        // Monta o details
+        newDetails.appendChild(summary);
+        newDetails.appendChild(content);
+
+        // Adiciona ao body ou a algum outro container
+        document.querySelector("#listPosts").appendChild(newDetails);
+    }
 </script>
