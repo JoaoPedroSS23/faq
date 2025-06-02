@@ -8,6 +8,7 @@ app.use(express.static('public'));
 app.set('views', 'src/views');
 
 app.use(bodyParser.json());
+app.use(express.urlencoded({extended: true}));
 
 require('./src/config/config');
 

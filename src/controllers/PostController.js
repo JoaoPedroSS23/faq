@@ -67,7 +67,20 @@ const del = async (req, res) => {
 
 const details = async (req, res) => {
     try{
-        const query = PostModel.where({ status: true });
+        let findData = { status: true };
+        let queryString = req.query;
+        
+        const query = PostModel.where(findData);
+
+        // => Filtro search
+        if(queryString?.sh?.length > 1) {
+            let orClause = [
+                {postTitle: {$regex: '.*' + queryString.sh + '.*'}},
+                {postDescription: {$regex: '.*' + queryString.sh + '.*'}}
+            ]
+            query.or(orClause);
+        }
+
         let posts = await query.find();
 
         res.send(posts);
