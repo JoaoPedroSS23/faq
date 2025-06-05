@@ -12,6 +12,7 @@
 
 .toastError {
   position: fixed;
+  z-index: 999;
   top: 50px;
   left: 50%;
   transform: translateX(-50%);
@@ -20,4 +21,9 @@
   padding: 16px 20px;
   border-radius: 8px;
   text-align: center;
+}
+
+#commentList {
+  display: flex;
+  flex-direction: column-reverse;
 }

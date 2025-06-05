@@ -25,7 +25,7 @@ const PostSchema = new Schema({
         default: true
     },
     comments: {
-        type: Comments,
+        type: [Comments],
 
     },
     postDate: {

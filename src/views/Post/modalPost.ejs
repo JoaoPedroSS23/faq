@@ -1,0 +1,94 @@
+
+<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-5 ">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="px-40 flex flex-1 justify-center py-5">
+                            <div class="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1">
+                                <div class="flex flex-wrap gap-2 p-4">
+                                    <a class="text-[#757575] text-base font-medium leading-normal" href="#">FAQ</a>
+                                    <span class="text-[#757575] text-base font-medium leading-normal">/</span>
+                                    <span class="text-[#141414] text-base font-medium leading-normal modalPostTitle"></span>
+                                </div>
+                                <h4 class="text-[#141414] tracking-light text-[18px] font-bold leading-tight px-4 text-left pb-3 pt-5 modalPostSubTitle"></h4>
+                                <p class="text-[#141414] text-base font-normal leading-normal pb-3 pt-1 px-4" id="modalPostDescription">
+                                </p>
+                                <h2 class="text-[#141414] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Comentários</h2>
+                                <div id="commentList"></div>
+                                <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                                    <input type="hidden" id="postId" />
+                                    <label class="flex flex-col min-w-40 flex-1">
+                                        <textarea
+                                            placeholder="Adicione um comentário"
+                                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#141414] focus:outline-0 focus:ring-0 border border-[#e0e0e0] bg-white focus:border-[#e0e0e0] min-h-36 placeholder:text-[#757575] p-[15px] text-base font-normal leading-normal"
+                                            id='comment'
+                                        ></textarea>
+                                    </label>
+                                </div>
+                                <div class="flex px-4 py-3 justify-end">
+                                    <button
+                                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 bg-black text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                                    >
+                                        <span class="truncate" id="submitComment">Enviar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" id='closeModalPost' class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const buttonSubmitComment = document.querySelector("#submitComment");
+
+    const handleSubmitComment = async() => {
+        disabledButton(buttonSubmitComment, true);
+        const commentText = document.querySelector('#comment');
+        const postId = document.querySelector("#postId").value;
+        
+        try {
+            if(commentText.value.replace(' ', '').length < 1) {
+                throw new Error('');
+                return;
+            };
+            
+            const request = await fetch(`v1/api/post/comment/${postId}`, {
+                headers: {
+                    "Content-Type": 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    comment: commentText.value
+                })
+            })
+    
+            if(request.status != 201) {
+                throw new Error("Um erro inesperado aconteceu, tente novamente mais tarde!")
+                return;
+            }
+
+            appendComment(commentText.value);
+            disabledButton(buttonSubmitComment, false);
+            commentText.value = '';
+
+        } catch(err) {
+            if(err.message.length > 1) {
+                showToastError(err.message);
+            }
+            commentText.value = '';
+            disabledButton(buttonSubmitComment, false);
+        }
+
+    }
+
+    buttonSubmitComment.addEventListener('click', handleSubmitComment);
+</script>

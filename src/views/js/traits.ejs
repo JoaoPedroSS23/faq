@@ -43,6 +43,95 @@
     
     }
 
+    const setComment = (comment) => {
+        const commentList = document.querySelector("#commentList");
+
+        const newCommentContainer = document.createElement('div');
+        newCommentContainer.className = 'flex w-full flex-row items-start justify-start gap-3 p-4';
+
+        const newCommentAvatar = document.createElement('div')
+        newCommentAvatar.className = 'bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 shrink-0';
+        newCommentAvatar.style.backgroundImage = "url('https://lh3.googleusercontent.com/aida-public/AB6AXuA34cpOYp-cbzNEBGtlyitpk1X1-PdiLpjTa2n60VD3j4Gnx3HpY2ElvMxF3YIT9Jau49ctC-9Xni9CoTbAZ6CenG25eE0uJGoNCtvEUXDj1P6JHUfEZHat4OuiLK3rc8gBoSwvlJouYcYTxmB705TYd6L8zLZ4crm3Lx7VnDSkZISZdYTp_WmaRoYmUY69si8AUekiuN6M7FiHAD9Rzczoz6lZOThGOgBl9i2nKY60FwLTYqlLxRtdteU_Go3s7s7sM6LaqsUzoKvo')";
+        
+        const newCommentCard = document.createElement('div');
+        newCommentCard.className = 'flex h-full flex-1 flex-col items-start justify-start';
+        
+        const newCommentIdentification = document.createElement('div');
+        newCommentIdentification.className = 'flex w-full flex-row items-start justify-start gap-x-3';
+
+        const title = document.createElement('p');
+        title.className = 'text-[#141414] text-sm font-bold leading-normal tracking-[0.015em]';
+        title.textContent = 'Autor Desconhecido';
+
+        const dateComment = document.createElement('p');
+        dateComment.className = 'text-[#757575] text-sm font-normal leading-normal';
+        dateComment.textContent = new Date(comment.commentDate).toLocaleDateString();
+
+        const description = document.createElement('p');
+        description.className = 'text-[#141414] text-sm font-normal leading-normal';
+        description.textContent = comment.commentDescription;
+
+        newCommentIdentification.appendChild(title);
+        newCommentIdentification.appendChild(dateComment);
+
+        newCommentCard.appendChild(newCommentIdentification);
+        newCommentCard.appendChild(description);
+
+        newCommentContainer.appendChild(newCommentAvatar);
+        newCommentContainer.appendChild(newCommentCard);
+
+        commentList.appendChild(newCommentContainer);
+    }
+
+    const setComments = (comments) => {
+        
+        const commentList = document.querySelector("#commentList");
+        commentList.innerText = '';
+
+        comments.map(comment => setComment(comment))
+    }
+
+    const getPost = async(id) => {
+        const titleElement = document.querySelector(".modalPostTitle");
+        const subtitleElement = document.querySelector(".modalPostSubTitle");
+        const descriptionElement = document.querySelector("#modalPostDescription");
+        const postId = document.querySelector("#postId");
+
+        try{
+            if(id == undefined || id == null) {
+                throw new Error("Dúvida não encontrada!");
+            }
+            const result = await fetch('v1/api/post?id=' + encodeURI(id));
+            const data = await result.json();
+
+            titleElement.innerText = data.postTitle;
+            subtitleElement.innerText = data.postTitle;
+            descriptionElement.innerText = data.postDescription;
+            postId.value = data._id
+
+            setComments(data.comments);
+
+        }catch(err){
+            console.error(err);
+        }
+
+    }
+
+    const openPost = (event) => {
+        const postId = event.target.getAttribute("postid");
+
+        //Carrega post e comentários
+        getPost(postId);
+
+        document.querySelector("#modalPost").style.display = 'block';
+    }
+
+    const closePost = () => {
+        document.querySelector("#modalPost").style.display = 'none';
+    }
+
+    document.querySelector("#closeModalPost").addEventListener('click', closePost);
+
 
     const createPost = (row) => {
         const newDetails = document.createElement('details');
@@ -88,13 +177,34 @@
         // Cria o parágrafo de conteúdo
         const content = document.createElement('p');
         content.className = 'text-[#757575] text-sm font-normal leading-normal pb-2';
-        content.textContent = row.postDescription; // ou coloque algum conteúdo aqui
+        content.textContent = row.postDescription; 
+
+        //Link para comentários
+
+        const aComment = document.createElement('a');
+        aComment.className = "text-[#cfcecc] text-sm leading-normal pb-2";
+        aComment.textContent = " Ver mais."
+        aComment.href = '#'
+        aComment.setAttribute('postId', row._id)
+        aComment.addEventListener('click', openPost);
+
+        
 
         // Monta o details
         newDetails.appendChild(summary);
         newDetails.appendChild(content);
+        newDetails.appendChild(aComment);
 
         // Adiciona ao body ou a algum outro container
         document.querySelector("#listPosts").appendChild(newDetails);
     }
+
+    const appendComment = (text) => {
+        const comment = {
+            commentDate: new Date().toJSON(),
+            commentDescription: text
+        }
+        setComment(comment)
+    }
+    
 </script>

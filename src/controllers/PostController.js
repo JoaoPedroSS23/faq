@@ -81,7 +81,17 @@ const details = async (req, res) => {
             query.or(orClause);
         }
 
-        let posts = await query.find();
+        let posts;
+
+        if(queryString?.id?.length > 1) {
+            query.and({_id: `${queryString.id}`});
+
+            posts = await query.findOne();
+        } else {
+            posts = await query.find();
+
+        }
+
 
         res.send(posts);
 
@@ -91,10 +101,44 @@ const details = async (req, res) => {
     }
 }
 
+const addComment = async(req, res) => {
+    try{
+        const id = req.params.id;
+        let comment = req.body.comment;
+        
+        let post = await PostModel.findById(id);
+
+        if(post == null) {
+            throw new Error("Dúvida não encontrada")
+        }
+
+        if(comment.replace(' ', '').length < 1) {
+            throw new Error("Comentário inválido!")
+        }
+
+        let comments = post.comments || [];
+
+        comments.push({
+            commentDescription: comment,
+            commentDate: new Date().toJSON()
+        });
+
+        post.comments = comments;
+        await post.save();
+
+        res.status(201).send('ok');
+
+    } catch(err) {
+        console.error(err);
+        res.send({message: `Não foi possível concluir sua solicitação, aguarde e tente novamente!`})
+    }
+}
+
 const PostController = {
     store: store,
     update: update,
     del: del,
-    details: details
+    details: details,
+    addComment: addComment
 }
 module.exports = PostController;

@@ -10,5 +10,6 @@ routes.post('/post', postController.store);
 routes.get('/post', postController.details);
 routes.put('/post/:id', postController.update);
 routes.delete('/post/:id', postController.del);
+routes.post('/post/comment/:id', postController.addComment)
 
 module.exports = routes;
