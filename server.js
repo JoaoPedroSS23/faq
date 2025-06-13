@@ -24,6 +24,13 @@ app.use('/v1/api', routesApi);
 // -> Rotas views
 app.use('/Post', routesPost);
 
+const router = express.Router();
+router.get("/", (req, res) => {
+    res.redirect('/Post');
+});
+
+app.use(router);
+
 
 app.listen(port, () => {
     console.log(`Server running in: http://localhost:${port}`)

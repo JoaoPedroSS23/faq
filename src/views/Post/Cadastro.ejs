@@ -14,6 +14,9 @@
         />
         </label>
     </div>
+    
+    <%- include('./../Components/toggleList.ejs') %>
+
     <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
         <label class="flex flex-col min-w-40 flex-1">
         <p class="text-[#141414] text-base font-medium leading-normal pb-2">Descrição Detalhada</p>
@@ -51,7 +54,7 @@
     // Métodos de validação    
 
     const validaCampos = () => {
-        if(titulo.value.length > 3 && descricao.value.length > 3) disabledButton(btnSubmit, false);
+        if(titulo.value.length > 3 && descricao.value.length > 3 && document.querySelector('#postTypeInput').value.length > 1) disabledButton(btnSubmit, false);
     }
     
     const validaTitulo = () => {
@@ -76,11 +79,22 @@
         validaCampos();
     }
 
+    const validaType = () => {
+        if(postType.value === '' || postType.value.length === 0) {
+            setRequired(postType);
+            disabledButton(btnSubmit, true);
+        } else {
+            resetRequired(postType);
+        }
+
+        validaCampos();
+    }
+
     
     // Events e métodos visuais
     titulo.addEventListener('blur', validaTitulo);
     descricao.addEventListener('blur', validaDecsricao);
-
+    
     async function submitPost() {
         disabledButton(btnSubmit, true);
 
@@ -93,7 +107,8 @@
                 method: 'POST',
                 body: JSON.stringify({
                         postTitle: titulo.value,
-                        postDescription: descricao.value
+                        postDescription: descricao.value,
+                        postType: document.querySelector('#postTypeInput').value
                     }),
                 headers: headers
             })

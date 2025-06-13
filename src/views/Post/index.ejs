@@ -27,26 +27,7 @@
                 </label>
             </div>
             <h2 class="text-[#141414] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Categorias</h2>
-            <div class="flex gap-3 p-3 flex-wrap pr-4">
-                <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4">
-                <p class="text-[#141414] text-sm font-medium leading-normal">Matrículas</p>
-                </div>
-                <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4">
-                <p class="text-[#141414] text-sm font-medium leading-normal">Transferências</p>
-                </div>
-                <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4">
-                <p class="text-[#141414] text-sm font-medium leading-normal">Documentos</p>
-                </div>
-                <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4">
-                <p class="text-[#141414] text-sm font-medium leading-normal">Calendário Escolar</p>
-                </div>
-                <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4">
-                <p class="text-[#141414] text-sm font-medium leading-normal">Programas e Projetos</p>
-                </div>
-                <div class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4">
-                <p class="text-[#141414] text-sm font-medium leading-normal">Outros</p>
-                </div>
-            </div>
+            <div id="listPostTypes"></div>
             <h2 class="text-[#141414] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Dúvidas Mais Frequentes</h2>
             <div class="flex flex-col p-4 gap-3" id='listPosts'></div>
         </div>
@@ -68,7 +49,12 @@
     }
     
     const getData = async(search = undefined) => {
-        const qs = search != undefined ? `?sh=${encodeURI(search)}` : '';
+        let qs = search != undefined ? `?sh=${encodeURI(search)}` : '';
+
+        if(window.location.search != '' && window.location.search != undefined) {
+            let complement = (qs.length > 1) ? "&" : "?";
+            qs = qs + complement + window.location.search.substr(1);
+        }
         
         const request = await fetch(`v1/api/post${qs}`, {
             method: 'GET'
@@ -82,7 +68,23 @@
         })
     }
 
-    getData()
+    const getTypesPost = async() => {
+        const request = await fetch('v1/api/post/types', {
+            method: "GET"
+        });
+
+        const data = await request.json();
+
+        // Listagem de tipos de dúvida
+        const postTypesList = document.createElement("div");
+        postTypesList.className = 'flex gap-3 p-3 flex-wrap pr-4';
+
+        data.map(type => createPostType(type, postTypesList))
+
+        document.querySelector("#listPostTypes").appendChild(postTypesList);
+    }
+    getData();
+    getTypesPost();
 
     const search = () => {
         const data = document.querySelector("#searchPost").value;

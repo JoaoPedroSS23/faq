@@ -130,10 +130,28 @@
         document.querySelector("#modalPost").style.display = 'none';
     }
 
-    document.querySelector("#closeModalPost").addEventListener('click', closePost);
+    document.querySelector("#closeModalPost")?.addEventListener('click', closePost);
 
+    const createPostType = (type, elementList) => {
+        const typePost = document.createElement('div');
+        typePost.className = 'flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-full bg-[#f2f2f2] pl-4 pr-4';
+
+        const title = document.createElement("a");
+        title.className = 'text-[#141414] text-sm font-medium leading-normal';
+        title.textContent = type.title;
+        title.setAttribute('typeId', type.idType);
+        title.style.cursor = 'pointer';
+        title.href='?type=' + type.title;
+
+        typePost.appendChild(title);
+        elementList.appendChild(typePost)
+
+    }
 
     const createPost = (row) => {
+        
+
+        // Criação da listagem de posts
         const newDetails = document.createElement('details');
         newDetails.className = 'flex flex-col rounded-xl border border-[#e0e0e0] bg-white px-[15px] py-[7px] group';
 

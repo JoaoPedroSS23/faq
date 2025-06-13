@@ -1,0 +1,161 @@
+<div id="postType" class='flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3'></div>
+
+<script type="module">
+/**
+ * Cria um combobox acessível estilizado com Tailwind.
+ * @param {Object}  cfg
+ * @param {string|HTMLElement} cfg.container  Seletor ou elemento‑pai onde o componente será montado
+ * @param {string[]}            cfg.options   Lista de opções
+ * @param {string}   [cfg.value]              Valor/label inicial (opcional)
+ * @param {string}   [cfg.placeholder]        Placeholder quando vazio (opcional)
+ */
+function createComboBox ({ container, options, value = '', placeholder = 'Selecione…' }) {
+    if (typeof container === 'string') container = document.querySelector(container);
+    if (!container) throw new Error('Container não encontrado.');
+
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'w-full inline-flex relative';
+    wrapper.dataset.hsComboBox = '';
+
+    
+    const inputWrap = document.createElement('div');
+    inputWrap.className = 'relative w-full';
+
+    const input = document.createElement('input');
+    input.type  = 'text';
+    input.role  = 'combobox';
+    input.value = value;
+    input.id    = "postTypeInput";
+    input.placeholder = placeholder;
+    input.setAttribute('aria-expanded', 'false');
+    input.className = 'py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm ' +
+                        'focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 dark:bg-neutral-900 ' +
+                        'dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600' +
+                        'py-2.5 sm:py-3 ps-4 pe-9 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 border border-[#dbdbdb] bg-neutral-50 focus:border-[#dbdbdb]';
+    input.dataset.hsComboBoxInput = '';
+
+    const toggle = document.createElement('div');
+    toggle.className = 'absolute top-1/2 end-3 -translate-y-1/2 cursor-pointer';
+    toggle.dataset.hsComboBoxToggle = '';
+    toggle.innerHTML = `
+        <svg class="shrink-0 size-3.5 text-gray-500 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></svg>`;
+
+    inputWrap.append(input, toggle);
+
+        /* dropdown */
+        const list = document.createElement('div');
+        list.className = 'absolute z-50 w-full max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 ' +
+                        'rounded-lg overflow-hidden overflow-y-auto dark:bg-neutral-900 dark:border-neutral-700';
+        list.style.display = 'none';
+        list.dataset.hsComboBoxOutput = '';
+        list.style.top  = 'calc(100% + 10px)';   // 10 px abaixo do input
+        list.style.left = '0';                   // alinha ao lado esquerdo do wrapper
+        list.style.display = 'none';
+        list.dataset.hsComboBoxOutput = '';
+
+    /* template do item */
+    const makeItem = (label, idx) => {
+        const item = document.createElement('div');
+        item.className = 'cursor-pointer py-2 px-4 w-full text-sm text-gray-800 hover:bg-gray-100 rounded-lg ' +
+                        'focus:outline-hidden focus:bg-gray-100 dark:bg-neutral-900 dark:hover:bg-neutral-800 ' +
+                        'dark:text-neutral-200 dark:focus:bg-neutral-800 flex flex-col min-w-40 flex-1';
+        item.tabIndex = idx;
+        item.dataset.hsComboBoxOutputItem = '';
+
+        item.innerHTML = `
+        <div class="flex justify-between items-center w-full">
+            <span data-hs-combo-box-search-text="${label}" data-hs-combo-box-value="">${label}</span>
+            <span class="hidden hs-combo-box-selected:block">
+            <svg class="shrink-0 size-3.5 text-blue-600 dark:text-blue-500"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            </span>
+        </div>`;
+        return item;
+    };
+
+    options.forEach((opt, i) => list.append(makeItem(opt, i)));
+
+    
+    wrapper.append(inputWrap, list);
+    container.append(wrapper);
+
+    
+    // abre/fecha
+    const toggleList = (force) => {
+        const open = force ?? (list.style.display === 'none');
+        list.style.display = open ? 'block' : 'none';
+        input.setAttribute('aria-expanded', open);
+    };
+    toggle.addEventListener('click', () => toggleList());
+    input.addEventListener('focus', () => toggleList(true));
+
+    // fecha clicando fora
+    document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) toggleList(false);
+        validaType()
+    });
+
+    // filtra enquanto digita
+    input.addEventListener('input', ({ target }) => {
+        const q = target.value.toLowerCase();
+        list.querySelectorAll('[data-hs-combo-box-output-item]').forEach(li => {
+        const text = li.querySelector('[data-hs-combo-box-search-text]').textContent.toLowerCase();
+        li.classList.toggle('hidden', !text.includes(q));
+        });
+    });
+
+    // seleciona item
+    list.addEventListener('click', (e) => {
+        const li = e.target.closest('[data-hs-combo-box-output-item]');
+        if (!li) return;
+        input.value = li.querySelector('[data-hs-combo-box-search-text]').textContent;
+        toggleList(false);
+        input.dispatchEvent(new CustomEvent('change', { detail: input.value })); // externo pode ouvir
+    });
+
+    const validaType = () => {
+        if(input.value === '' || input.value.length === 0) {
+            setRequired(input);
+            disabledButton(btnSubmit, true);
+        } else {
+            resetRequired(input);
+        }
+
+        validaCampos();
+    }
+
+    input.addEventListener('blur', validaType);
+    }
+
+    /* ---------- 4 — uso ---------- */
+    document.addEventListener('DOMContentLoaded', async() => {
+        // Carrega tipos de dúvida 
+        const result = await fetch('/v1/api/post/types', {
+            method: "GET"
+        });
+
+        const types = await result.json().then(items => {
+            let array = [];
+            items.map(item => {
+                array.push(item.title)
+            })
+
+            return array;
+        });
+
+        createComboBox({
+            container   : '#postType',
+            value       : '',
+            options     : types,
+            placeholder : 'Selecione ou Forneça um novo tipo'
+        });
+
+});
+</script>

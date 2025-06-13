@@ -8,7 +8,8 @@ const store = async (req, res) => {
             let post = {
                 'postTitle': body.postTitle,
                 'postDescription': body.postDescription,
-                'postdate': new Date().toJSON()
+                'postdate': new Date().toJSON(),
+                'postType': body.postType
             }
             await PostModel.create(post)
 
@@ -81,6 +82,10 @@ const details = async (req, res) => {
             query.or(orClause);
         }
 
+        if(queryString?.type?.length > 0 && queryString?.type != 'Geral') {
+            query.and({postType: `${queryString.type}`});
+        }
+
         let posts;
 
         if(queryString?.id?.length > 1) {
@@ -91,6 +96,7 @@ const details = async (req, res) => {
             posts = await query.find();
 
         }
+
 
 
         res.send(posts);
@@ -134,11 +140,39 @@ const addComment = async(req, res) => {
     }
 }
 
+const getTypes = async (req, res) => {
+    let typeId = 0;
+    let types = [{title: 'Geral', idType: "0"}];
+
+    const query = PostModel.distinct('postType');
+    const results = await query.find();
+
+    results.map(item => {
+        if(item.postType !== undefined && !includedType(item.postType, types)) {
+            types.push({title: item.postType, idType: ++typeId});
+        }
+    })
+
+    res.send(types)
+}
+
+const includedType = (type, typeList) => {
+    if(typeList.length > 0) {
+        const types = typeList.map(item => {
+            return item.title
+        })
+
+        return types.includes(type)
+
+    }
+}
+
 const PostController = {
     store: store,
     update: update,
     del: del,
     details: details,
-    addComment: addComment
+    addComment: addComment,
+    getTypes: getTypes
 }
 module.exports = PostController;

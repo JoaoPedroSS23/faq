@@ -30,6 +30,9 @@ const PostSchema = new Schema({
     },
     postDate: {
         type: Date
+    },
+    postType: {
+        type: String
     }
 });
 

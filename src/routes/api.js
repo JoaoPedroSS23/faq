@@ -11,5 +11,6 @@ routes.get('/post', postController.details);
 routes.put('/post/:id', postController.update);
 routes.delete('/post/:id', postController.del);
 routes.post('/post/comment/:id', postController.addComment)
+routes.get('/post/types', postController.getTypes)
 
 module.exports = routes;
