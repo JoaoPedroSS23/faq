@@ -18,11 +18,14 @@ const routesApi = require('./src/routes/api');
 
 const routesPost = require('./src/routes/post');
 
+const routesLogin = require('./src/routes/auth');
+
 // -> Rotas da api
 app.use('/v1/api', routesApi);
 
 // -> Rotas views
 app.use('/Post', routesPost);
+app.use('/Login', routesLogin);
 
 const router = express.Router();
 router.get("/", (req, res) => {
