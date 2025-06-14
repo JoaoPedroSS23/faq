@@ -71,7 +71,7 @@ const details = async (req, res) => {
         let findData = { status: true };
         let queryString = req.query;
         
-        const query = PostModel.where(findData);
+        const query = PostModel.where(findData).sort({_id: 'desc'});
 
         // => Filtro search
         if(queryString?.sh?.length > 1) {
